@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCraft - Cursor AI Message</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #ffffff;
+        }
+        .container {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #404040;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #4CAF50;
+            margin: 0;
+        }
+        .message-box {
+            background: #1e1e1e;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+            position: relative;
+        }
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .copy-btn:hover {
+            background: #45a049;
+        }
+        .instructions {
+            background: #2d2d2d;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #4CAF50;
+            color: white;
+        }
+        .info {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CodeCraft → Cursor AI</h1>
+            <p>Your message is ready to send to Cursor AI!</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 How to use:</h3>
+            <ol>
+                <li>Click the "Copy Message" button below</li>
+                <li>Open Cursor AI</li>
+                <li>Go to the chat interface</li>
+                <li>Paste the message (Ctrl+V)</li>
+                <li>Cursor AI will generate the code changes!</li>
+            </ol>
+        </div>
+        
+        <div class="message-box" id="messageBox">
+            Loading message...
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="copy-btn" onclick="copyMessage()">📋 Copy Message</button>
+            <button class="copy-btn" onclick="openCursor()">🚀 Open Cursor AI</button>
+        </div>
+        
+        <div class="status info" id="status">
+            Ready to copy message to clipboard
+        </div>
+    </div>
+
+    <script>
+        // Get the message from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message') || 'No message provided';
+        
+        // Display the message
+        document.getElementById('messageBox').textContent = message;
+        
+        function copyMessage() {
+            navigator.clipboard.writeText(message).then(() => {
+                document.getElementById('status').innerHTML = '✅ Message copied to clipboard! Now paste it in Cursor AI chat.';
+                document.getElementById('status').className = 'status success';
+            }).catch(err => {
+                document.getElementById('status').innerHTML = '❌ Failed to copy to clipboard. Please select and copy manually.';
+                document.getElementById('status').className = 'status error';
+            });
+        }
+        
+        function openCursor() {
+            // Try to open Cursor AI
+            window.open('cursor://', '_blank');
+        }
+        
+        // Auto-copy on page load
+        window.addEventListener('load', () => {
+            setTimeout(copyMessage, 500);
+        });
+    </script>
+</body>
+</html>
+
+
+

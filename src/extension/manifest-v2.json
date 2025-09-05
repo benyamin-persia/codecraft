@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+  "name": "CodeCraft - Visual AI Coding Assistant",
+  "version": "1.0.0",
+  "description": "Free alternative to Stagewise - Click elements and tell AI what to change",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "http://localhost:*/*",
+    "https://localhost:*/*",
+    "http://127.0.0.1:*/*",
+    "https://127.0.0.1:*/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "CodeCraft"
+  },
+  "web_accessible_resources": [
+    "panel.html",
+    "panel.js",
+    "panel.css"
+  ]
+}
+
+
+

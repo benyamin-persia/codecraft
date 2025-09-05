@@ -1,0 +1,70 @@
+{
+  "name": "codecraft-cursor-extension",
+  "displayName": "CodeCraft - Visual AI Coding Assistant",
+  "description": "Visual AI coding assistant - Select any element and send directly to Cursor AI chat. The free alternative to Stagewise.",
+  "version": "1.0.5",
+  "publisher": "benyamin-persia",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Visualization"
+  ],
+  "keywords": [
+    "ai",
+    "cursor",
+    "visual",
+    "coding",
+    "assistant",
+    "stagewise",
+    "alternative",
+    "codecraft",
+    "visual ai",
+    "visual coding",
+    "ai coding assistant"
+  ],
+  "license": "MIT",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codecraft.sendMessage",
+        "title": "Send CodeCraft Message to Chat"
+      },
+      {
+        "command": "codecraft.testIntegration",
+        "title": "Test CodeCraft Integration"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "codecraft.sendMessage",
+          "when": "true"
+        },
+        {
+          "command": "codecraft.testIntegration",
+          "when": "true"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  }
+}

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCraft - Visual AI Coding Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .status {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .instructions {
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .instructions ol {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn.success {
+            background: #28a745;
+        }
+
+        .btn.success:hover {
+            background: #218838;
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .connection-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎯</div>
+        <h1>CodeCraft</h1>
+        <p class="subtitle">Visual AI Coding Assistant - Free Alternative to Stagewise</p>
+        
+        <div id="status" class="status">
+            <div id="status-text">Checking server connection...</div>
+        </div>
+
+        <div id="instructions" class="instructions">
+            <h3>🎯 CodeCraft is Ready! (Like Stagewise)</h3>
+            <p><strong>Automatic Setup:</strong></p>
+            <ol>
+                <li><strong>Open your React app</strong> in another browser tab (e.g., localhost:3000)</li>
+                <li><strong>Click the button below</strong> to automatically inject CodeCraft</li>
+                <li><strong>Start selecting elements</strong> in your React app!</li>
+            </ol>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button onclick="openInjector()" class="btn success" style="font-size: 18px; padding: 15px 30px;">
+                    🚀 Auto-Inject CodeCraft
+                </button>
+            </div>
+            
+            <p><strong>Manual Option:</strong> Add this to your React app's HTML head:</p>
+            <code>&lt;script src="http://localhost:3100/codecraft.js"&gt;&lt;/script&gt;</code>
+        </div>
+
+        <div id="controls">
+            <button id="startBtn" class="btn" onclick="startCodeCraft()">
+                🚀 Start CodeCraft
+            </button>
+            <button id="stopBtn" class="btn" onclick="stopCodeCraft()" style="display: none;">
+                ⏹️ Stop CodeCraft
+            </button>
+        </div>
+
+        <div id="connectionInfo" class="connection-info hidden">
+            <strong>CodeCraft is running!</strong><br>
+            Open your React app in another tab and start selecting elements.
+        </div>
+    </div>
+
+    <script>
+        let isActive = false;
+        let selectedElement = null;
+        let overlay = null;
+        let panel = null;
+
+        // Check server connection on load
+        window.addEventListener('load', checkServerConnection);
+        
+        // Open the auto-injector
+        function openInjector() {
+            window.open('http://localhost:3100/inject', '_blank', 'width=600,height=400');
+        }
+
+        async function checkServerConnection() {
+            try {
+                const response = await fetch('http://localhost:3100/api/status');
+                if (response.ok) {
+                    updateStatus('✅ Server connected! Ready to start CodeCraft.', 'success');
+                    document.getElementById('instructions').classList.remove('hidden');
+                } else {
+                    updateStatus('❌ Server not responding. Make sure CodeCraft server is running.', 'error');
+                }
+            } catch (error) {
+                updateStatus('❌ Cannot connect to server. Run: node src/server/index.js', 'error');
+            }
+        }
+
+        function updateStatus(message, type = '') {
+            const statusEl = document.getElementById('status');
+            const statusTextEl = document.getElementById('status-text');
+            
+            statusTextEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        function startCodeCraft() {
+            if (isActive) return;
+
+            isActive = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('connectionInfo').classList.remove('hidden');
+
+            // Create overlay and panel
+            createOverlay();
+            createPanel();
+
+            // Add event listeners to all open tabs
+            addEventListenersToAllTabs();
+
+            updateStatus('🎯 CodeCraft is active! Select elements on your React app.', 'success');
+        }
+
+        function stopCodeCraft() {
+            if (!isActive) return;
+
+            isActive = false;
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('connectionInfo').classList.add('hidden');
+
+            // Remove overlay and panel
+            if (overlay) overlay.remove();
+            if (panel) panel.remove();
+
+            updateStatus('CodeCraft stopped. Click "Start CodeCraft" to begin.', '');
+        }
+
+        function createOverlay() {
+            overlay = document.createElement('div');
+            overlay.id = 'codecraft-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.1);
+                z-index: 999999;
+                pointer-events: none;
+                display: none;
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function createPanel() {
+            panel = document.createElement('div');
+            panel.id = 'codecraft-panel';
+            panel.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                width: 350px;
+                background: white;
+                border: 1px solid #e1e5e9;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+                z-index: 1000000;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                display: none;
+                pointer-events: auto;
+            `;
+            
+            panel.innerHTML = `
+                <div style="padding: 16px; border-bottom: 1px solid #e1e5e9;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">
+                            🎯 CodeCraft
+                        </h3>
+                        <button id="codecraft-close" style="
+                            background: none;
+                            border: none;
+                            font-size: 18px;
+                            cursor: pointer;
+                            color: #666;
+                            padding: 4px;
+                        ">×</button>
+                    </div>
+                </div>
+                
+                <div style="padding: 16px;">
+                    <div id="codecraft-status" style="
+                        padding: 12px;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        margin-bottom: 16px;
+                        font-size: 14px;
+                        color: #666;
+                    ">
+                        Click on any element to select it for modification
+                    </div>
+                    
+                    <div id="codecraft-selected" style="display: none; margin-bottom: 16px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Selected Element:</div>
+                        <div id="codecraft-element-info" style="
+                            padding: 8px;
+                            background: #e3f2fd;
+                            border-radius: 6px;
+                            font-size: 13px;
+                            font-family: monospace;
+                        "></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #1a1a1a;">
+                            What do you want to change?
+                        </label>
+                        <textarea id="codecraft-instruction" placeholder="e.g., Change the button color to blue, make the text larger, add a hover effect..." style="
+                            width: 100%;
+                            height: 80px;
+                            padding: 12px;
+                            border: 1px solid #e1e5e9;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            font-family: inherit;
+                            resize: vertical;
+                            box-sizing: border-box;
+                        "></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; flex-direction: column;">
+                        <button id="codecraft-send-cursor" style="
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            padding: 12px;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            font-weight: 500;
+                            cursor: pointer;
+                            transition: background 0.2s;
+                        ">
+                            🚀 Send to Cursor AI
+                        </button>
+                        <button id="codecraft-clear" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 12px;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            cursor: pointer;
+                            transition: background 0.2s;
+                        ">
+                            Clear Selection
+                        </button>
+                    </div>
+                    
+                    <div id="codecraft-loading" style="
+                        display: none;
+                        text-align: center;
+                        padding: 16px;
+                        color: #666;
+                    ">
+                        <div style="margin-bottom: 8px;">🤖 Sending to Cursor AI...</div>
+                    </div>
+                    
+                    <div id="codecraft-result" style="
+                        display: none;
+                        margin-top: 16px;
+                        padding: 12px;
+                        background: #d4edda;
+                        border: 1px solid #c3e6cb;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        color: #155724;
+                    "></div>
+                </div>
+            `;
+            
+            document.body.appendChild(panel);
+            setupPanelEvents();
+        }
+
+        function setupPanelEvents() {
+            const closeBtn = panel.querySelector('#codecraft-close');
+            const clearBtn = panel.querySelector('#codecraft-clear');
+            const sendCursorBtn = panel.querySelector('#codecraft-send-cursor');
+            const instructionInput = panel.querySelector('#codecraft-instruction');
+
+            closeBtn.addEventListener('click', () => {
+                panel.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+            
+            clearBtn.addEventListener('click', clearSelection);
+            sendCursorBtn.addEventListener('click', sendToCursorAI);
+            
+            instructionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    sendToCursorAI();
+                }
+            });
+        }
+
+        function addEventListenersToAllTabs() {
+            // This is a simplified approach - in a real implementation,
+            // you'd need to inject scripts into other tabs
+            console.log('CodeCraft: Ready to select elements!');
+        }
+
+        function selectElement(element) {
+            selectedElement = element;
+            
+            // Remove previous selection styling
+            document.querySelectorAll('.codecraft-selected').forEach(el => {
+                el.classList.remove('codecraft-selected');
+                el.style.outline = '';
+                el.style.outlineOffset = '';
+            });
+            
+            // Add selection styling
+            element.classList.add('codecraft-selected');
+            element.style.outline = '2px solid #28a745';
+            element.style.outlineOffset = '2px';
+            
+            // Update panel
+            updateElementInfo(element);
+            updatePanelStatus('Element selected! Enter your instruction below.');
+            
+            // Show panel
+            panel.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        function updateElementInfo(element) {
+            const infoDiv = panel.querySelector('#codecraft-element-info');
+            const selectedDiv = panel.querySelector('#codecraft-selected');
+            
+            const context = getElementContext(element);
+            infoDiv.innerHTML = `
+                <strong>${context.tagName}</strong>
+                ${context.id ? `#${context.id}` : ''}
+                ${context.className ? `.${context.className.split(' ').join('.')}` : ''}
+                ${context.textContent ? `<br/>"${context.textContent}"` : ''}
+            `;
+            
+            selectedDiv.style.display = 'block';
+        }
+
+        function getElementContext(element) {
+            return {
+                tagName: element.tagName.toLowerCase(),
+                className: element.className,
+                id: element.id,
+                textContent: element.textContent?.substring(0, 100) || '',
+                attributes: Array.from(element.attributes).reduce((acc, attr) => {
+                    acc[attr.name] = attr.value;
+                    return acc;
+                }, {})
+            };
+        }
+
+        function updatePanelStatus(message) {
+            const statusDiv = panel.querySelector('#codecraft-status');
+            statusDiv.textContent = message;
+        }
+
+        function clearSelection() {
+            selectedElement = null;
+            
+            // Remove selection styling
+            document.querySelectorAll('.codecraft-selected').forEach(el => {
+                el.classList.remove('codecraft-selected');
+                el.style.outline = '';
+                el.style.outlineOffset = '';
+            });
+            
+            // Clear panel
+            panel.querySelector('#codecraft-selected').style.display = 'none';
+            panel.querySelector('#codecraft-instruction').value = '';
+            panel.querySelector('#codecraft-result').style.display = 'none';
+            updatePanelStatus('Click on any element to select it for modification');
+        }
+
+        async function sendToCursorAI() {
+            if (!selectedElement) {
+                updatePanelStatus('Please select an element first');
+                return;
+            }
+            
+            const instruction = panel.querySelector('#codecraft-instruction').value.trim();
+            if (!instruction) {
+                updatePanelStatus('Please enter an instruction');
+                return;
+            }
+            
+            // Show loading state
+            panel.querySelector('#codecraft-loading').style.display = 'block';
+            panel.querySelector('#codecraft-send-cursor').disabled = true;
+            
+            try {
+                const elementContext = getElementContext(selectedElement);
+                const cursorMessage = buildCursorMessage(instruction, elementContext);
+                
+                console.log('CodeCraft: Sending message to Cursor AI...');
+                console.log('CodeCraft: Element:', elementContext.tagName, elementContext.className || elementContext.id);
+                console.log('CodeCraft: Instruction:', instruction);
+                
+                // Send to CodeCraft server which will handle Cursor AI integration
+                const response = await fetch('http://localhost:3100/api/send-to-cursor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        instruction,
+                        elementContext,
+                        message: cursorMessage
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.sentToChat) {
+                        showResult('✅ Message sent directly to Cursor AI chat! Check your chat window.');
+                    } else if (result.clipboardCopied) {
+                        showResult('📋 Message copied to clipboard! Paste it in your Cursor AI chat (Ctrl+V)');
+                    } else {
+                        showResult('✅ Sent to Cursor AI! Check your Cursor chat.');
+                    }
+                    panel.querySelector('#codecraft-instruction').value = '';
+                } else {
+                    showResult(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('CodeCraft: Error sending to Cursor AI:', error);
+                showResult(`❌ Error: ${error.message}`);
+            } finally {
+                panel.querySelector('#codecraft-loading').style.display = 'none';
+                panel.querySelector('#codecraft-send-cursor').disabled = false;
+            }
+        }
+
+        function buildCursorMessage(instruction, elementContext) {
+            return `I want to modify this element in my React component:
+
+ELEMENT CONTEXT:
+- Tag: ${elementContext.tagName}
+- Classes: ${elementContext.className || 'none'}
+- ID: ${elementContext.id || 'none'}
+- Text: ${elementContext.textContent || 'none'}
+
+INSTRUCTION: ${instruction}
+
+Please modify the code to implement this change. Focus on the specific element and make the requested modification.`;
+        }
+
+        function showResult(message) {
+            const resultDiv = panel.querySelector('#codecraft-result');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

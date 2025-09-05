@@ -1,0 +1,111 @@
+/* CodeCraft Content Script Styles */
+
+.codecraft-selected {
+  outline: 2px solid #28a745 !important;
+  outline-offset: 2px !important;
+  position: relative !important;
+}
+
+.codecraft-selected::before {
+  content: "✓ Selected";
+  position: absolute;
+  top: -25px;
+  left: 0;
+  background: #28a745;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 1000001;
+  pointer-events: none;
+}
+
+/* Hover effects for selectable elements */
+*:hover {
+  cursor: crosshair !important;
+}
+
+/* Ensure the panel is always on top */
+#codecraft-panel {
+  z-index: 1000000 !important;
+}
+
+/* Overlay styles */
+#codecraft-overlay {
+  z-index: 999999 !important;
+}
+
+/* Prevent text selection during element selection */
+.codecraft-active * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+/* Smooth transitions */
+#codecraft-panel * {
+  transition: all 0.2s ease;
+}
+
+/* Button hover effects */
+#codecraft-panel button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Input focus effects */
+#codecraft-panel input:focus,
+#codecraft-panel textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Loading animation */
+@keyframes codecraft-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+#codecraft-loading {
+  animation: codecraft-pulse 1.5s ease-in-out infinite;
+}
+
+/* Success/Error message animations */
+@keyframes codecraft-slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#codecraft-result {
+  animation: codecraft-slideIn 0.3s ease-out;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  #codecraft-panel {
+    width: 300px !important;
+    right: 10px !important;
+    top: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #codecraft-panel {
+    width: calc(100vw - 20px) !important;
+    right: 10px !important;
+    left: 10px !important;
+  }
+}
+
+
+

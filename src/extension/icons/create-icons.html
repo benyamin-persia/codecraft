@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeCraft Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .icon-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .icon {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+        .icon-16 { width: 16px; height: 16px; font-size: 10px; }
+        .icon-32 { width: 32px; height: 32px; font-size: 16px; }
+        .icon-48 { width: 48px; height: 48px; font-size: 24px; }
+        .icon-128 { width: 128px; height: 128px; font-size: 64px; }
+    </style>
+</head>
+<body>
+    <h1>CodeCraft Extension Icons</h1>
+    <p>Right-click on each icon and "Save image as" to create the icon files.</p>
+    
+    <div class="icon-container">
+        <div class="icon icon-16">🎯</div>
+        <div>16x16</div>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-32">🎯</div>
+        <div>32x32</div>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-48">🎯</div>
+        <div>48x48</div>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-128">🎯</div>
+        <div>128x128</div>
+    </div>
+    
+    <script>
+        // Create downloadable icons
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#007bff');
+            gradient.addColorStop(1, '#0056b3');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Add rounded corners
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, size * 0.2);
+            ctx.fill();
+            
+            // Reset composite operation
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // Add target emoji
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+            ctx.fillText('🎯', size / 2, size / 2);
+            
+            return canvas;
+        }
+        
+        // Create download links
+        [16, 32, 48, 128].forEach(size => {
+            const canvas = createIcon(size);
+            const link = document.createElement('a');
+            link.download = `icon${size}.png`;
+            link.href = canvas.toDataURL();
+            link.textContent = `Download ${size}x${size}`;
+            link.style.display = 'block';
+            link.style.margin = '10px 0';
+            document.body.appendChild(link);
+        });
+    </script>
+</body>
+</html>
+
+
+

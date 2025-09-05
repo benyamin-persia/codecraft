@@ -1,0 +1,21 @@
+# Source files
+src/**
+tsconfig.json
+*.ts
+
+# Development files
+.vscode/**
+.git/**
+.gitignore
+README.md
+CHANGELOG.md
+
+# Node modules (keep only production dependencies)
+node_modules/**
+!node_modules/axios/**
+!node_modules/axios/**
+
+# Build artifacts
+*.map
+*.log
+
