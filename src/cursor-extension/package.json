@@ -1,8 +1,8 @@
 {
-  "name": "codecraft-cursor-extension",
+  "name": "codecraft",
   "displayName": "CodeCraft - Visual AI Coding Assistant",
   "description": "Visual AI coding assistant - Select any element and send directly to Cursor AI chat. The free alternative to Stagewise.",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "publisher": "benyamin-persia",
   "engines": {
     "vscode": "^1.74.0"
@@ -25,6 +25,14 @@
     "visual coding",
     "ai coding assistant"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benyamin-persia/codecraft"
+  },
+  "homepage": "https://github.com/benyamin-persia/codecraft",
+  "bugs": {
+    "url": "https://github.com/benyamin-persia/codecraft/issues"
+  },
   "license": "MIT",
   "activationEvents": [
     "onStartupFinished"

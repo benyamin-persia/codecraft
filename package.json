@@ -1,6 +1,6 @@
 {
   "name": "visual-codecraft",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "Free alternative to Stagewise - Visual AI coding assistant",
   "main": "src/server/index.js",
   "bin": {
@@ -21,8 +21,16 @@
     "cursor",
     "stagewise"
   ],
-  "author": "Your Name",
+  "author": "benyamin-persia",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benyamin-persia/codecraft"
+  },
+  "homepage": "https://github.com/benyamin-persia/codecraft",
+  "bugs": {
+    "url": "https://github.com/benyamin-persia/codecraft/issues"
+  },
   "dependencies": {
     "axios": "^1.11.0",
     "chokidar": "^3.5.3",

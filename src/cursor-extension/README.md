@@ -51,7 +51,8 @@ npx visual-codecraft@latest
 
 ## Support
 
-- Contact: Use the extension's command palette for support
+- GitHub: https://github.com/benyamin-persia/codecraft
+- Issues: https://github.com/benyamin-persia/codecraft/issues
 
 ## License
 
